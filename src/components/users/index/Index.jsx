@@ -2,20 +2,24 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-
-
+import Loder from '../../Loder.jsx';
 
 function Index() {
+  let [loader,setLoader]= useState(false);
     const [users,setUsers]= useState([]);
     const getUsers = async()=>{
         const {data} = await axios.get("https://crud-users-gold.vercel.app/users/")
-       console.log(data.users);
+       setUsers(data.users);
+       setLoader(false);
     }
 
     const deleteUser = async(id)=>{
+      setLoader(true);
       const {data} = await axios.delete(`https://crud-users-gold.vercel.app/users/${id}`)
     if(data.message=='success'){
       toast.success("User delete successfully");
+      setLoader(false);
+      getUsers();
     }
   }
     
@@ -28,6 +32,11 @@ function Index() {
   
   },[users])
 
+  if(loader){
+    return(
+       <Loder/>
+    )
+}
   return (
     <div className="container-fluid">
   <div className="row flex-nowrap">
@@ -133,6 +142,9 @@ function Index() {
                     <td>{user.password}</td>
                     <td onClick={()=>deleteUser(user-_id)}>delete</td>
                     <td><Link to={`/user/$user._id}`}>details</Link></td>
+                    <td onClick={()=>deleteUser(user-_id)}>
+                      <Link to={`/user/edit/${user._id}`}>edit</Link>
+                      </td>
                 </tr>
             </React.Fragment>
         )

@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import axios from 'axios' ;
 import {toast} from 'react-toastify'
 import {useNavigate} from 'react-router-dom'
-import Input from '../shared/Input.jsx'
-import {validationuserData} from '../validation/uservalidation.js'
-import Loder from '../../Loder.jsx';
+import Input from './users/shared/Input.jsx';
+import { validationuserData } from './users/validation/uservalidation';
+import Loder from './Loder.jsx';
 
-export default function Create() {
+export default function Edit() {
  const navigate=useNavigate();
  let [loader,setLoader]= useState(false);
  let [errors, setErrors] = useState({
@@ -15,13 +15,21 @@ export default function Create() {
     password: ''
 
 })
-
+let [users,setUsers]= useState({});
  let [user, setUsre] = useState({
         name: '',
         email: '',
         password: ''
     
     });
+    
+    const {id}=useParams('id')
+
+    const getUsers = async()=>{
+        const {data} = await axios.get(`https://crud-users-gold.vercel.app/users/${id}`)
+       setUsers(data.users);
+    }
+
     let [errorBack,setErrorBake]=useState('');
     const handelData = (e) =>{
         const {name,value}= e.target;
@@ -36,7 +44,7 @@ export default function Create() {
             setErrors(validationuserData(user))
         }
         else{
-            try{const {data} = await axios.post('https://crud-users-gold.vercel.app/users/',user);
+            try{const {data} = await axios.post('https://crud-users-gold.vercel.app/users/${id}',user);
             console.log(data);
             if(data.message=='success'){
                 toast.success("User successfully")
@@ -142,9 +150,9 @@ export default function Create() {
                 <div className="col py-3">
                     <form onSubmit={sendData}>
                         
-                <input  errors={errors} id={'username'} title={'user name'} type= {'text'} name={'name'}  handelData={handelData}/>
-                <input  errors={errors} id={'email'} title={'user email'}  type={'email'} name={'email'} handelData={handelData}/>
-                <input errors={errors} id={'password'} title={'user password'} type={'password'} name={'passsword'}  handelData={handelData}/> 
+                <input  errors={errors} id={'username'} title={'user name'} value={user.name} type= {'text'} name={'name'}  handelData={handelData}/>
+                <input  errors={errors} id={'email'} title={'user email'}  value={user.email} type={'email'} name={'email'} handelData={handelData}/>
+                <input errors={errors} id={'password'} title={'user password'} value={user.password} type={'password'} name={'passsword'}  handelData={handelData}/> 
                 <div className="mp-3">
                 <input type='submit'   className='form-control' value={'Add user'}/>
                   </div>  
